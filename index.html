@@ -1,0 +1,434 @@
+
+<html>
+<head>
+<title>Computer Vision Project</title>
+<link href='http://fonts.googleapis.com/css?family=Nunito:300|Crimson+Text|Droid+Sans+Mono' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" title="Default" href="styles/github.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>  
+
+<link rel="stylesheet" href="highlighting/styles/default.css">
+<script src="highlighting/highlight.pack.js"></script>
+
+<style type="text/css">
+body {
+	margin: 0px;
+	width: 100%;
+	font-family: 'Crimson Text', serif;
+	font-size: 20px;
+	background: #fcfcfc;
+}
+h1 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 28px;
+	margin: 25px 0px 0px 0px;
+	text-transform: lowercase;
+
+}
+
+h2 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 32px;
+	margin: 15px 0px 35px 0px;
+	color: #333;	
+	word-spacing: 3px;
+}
+
+h3 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 26px;
+	margin: 10px 0px 10px 0px;
+	color: #333;
+	word-spacing: 2px;
+}
+h4 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 22px;
+	margin: 10px 0px 10px 0px;
+	color: #333;
+	word-spacing: 2px;
+}
+
+h5 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 18px;
+	margin: 10px 0px 10px 0px;
+	color: #111;
+	word-spacing: 2px;
+}
+
+p, li {
+	color: #444;
+}
+
+a {
+	color: #DE3737;
+}
+
+.container {
+	margin: 0px auto 0px auto;
+	width: 960px;
+}
+
+#header {
+	background: #333;
+	width: 100%;
+}
+
+#headersub {
+	color: #ccc;
+	width: 960px;
+	margin: 0px auto 0px auto;
+	padding: 20px 0px 20px 0px;
+}
+
+.chart {
+	width: 480px;
+}
+.lol {
+	font-size: 16px;
+	color: #888;
+	font-style: italic;
+}
+.sep {
+	height: 1px;
+	width: 100%;
+	background: #999;
+	margin: 20px 0px 20px 0px;
+}
+.footer{
+	font-size: 16px;
+}
+.latex {
+	width: 100%;
+}
+
+.latex img {
+	display: block;
+	margin: 0px auto 0px auto;
+}
+
+pre {
+	font-family: 'Droid Sans Mono';
+	font-size: 14px;
+}
+
+td img {
+  vertical-align: middle;
+}
+
+#contents a {
+}
+</style>
+<script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+</script>
+</head>
+<body>
+<div id="header" >
+<div id="headersub">
+<h1><span style="color: #DE3737">Sandhya Sridhar</span></h1>
+</div>
+</div>
+<div class="container">
+
+<h2>Project 1: Image Filtering and Hybrid Images</h2>
+
+<div style="align: center; padding: 20px">
+<center><img src="hybrid_image.jpg" width="60%" align = "middle"/>
+<p style="font-size: 14px">Ah, the first Automobile! Now take a few steps back, and have a look! Wait, is that a GLA?</p></center>
+</div>
+
+<p align = 'justify'> The aim of this project is to create a hybrid image by combining two images, and filtering them for low and high frequencies. The high frequency image dominates the view when the hybrid image is looked at from a close distance, and the low frequency image dominates when the viewer moves far from the image. By combining these two filtered images, a hybrid image is obtained. </p>
+<p align = 'justify'>To perform the filtering of images, Matlab's inbuilt command 'imfilter' has been replicated in this assignment. The overall process followed to create a hybrid image:</p>
+<ol>
+<li> Padding the input images</li>
+<li> Calculating the low and high frequency images</li>
+<li> Adding the above two images to form the hybrid image</li>
+</ol>
+<h2> Algorithm </h2>
+ <ul><font color = "blue">
+ <li>Reading the input image</li>
+ <li>Choose the Low and High frequencies, and the filter type</li>
+ <li> Remove the high pass frequency from image1 by blurring it </li>
+ <li>Remove the low pass frequency from image2</li>
+ <li>Subtract the filtered image from the original image</li>
+ <li>In the my_imfilter function, pad the input images appropriately (Nearby pixels replicated in this project) </li>
+ <li> Perform convolution of the image and the filter</li>
+ <li>Add the low and high frequency images, to get the hybrid image </li>
+ </font> </ul>
+
+<h2> Code </h2>
+<pre><code>
+%implementation of my_filter function
+function output = my_imfilter(image, filter,type)
+% Handles the cases where the filter sizes are not given as odd numbers
+if (~mod(size(filter, 1), 2) || ~mod(size(filter, 2), 2))
+    error('The row and column size of the filter have to be in odd numbers.');
+end
+
+% The default option is padding with zeros
+if (nargin < 3)
+    type = 'zero';
+end
+
+%Calclate the row and column margin, to pad the input image
+row_margin = (size(filter, 1) - 1) / 2;
+col_margin = (size(filter, 2) - 1) / 2;
+output  = zeros(size(image));
+
+%processing the input image
+for ii = 1:size(image,3)    
+	% pad the image array with zeros
+    if strcmp(type, 'zero')
+        input(:,:,ii) = padarray(image(:, :, ii), [row_margin col_margin]);
+    %pad the image array using the value of the nearby pixel
+    elseif strcmp(type, 'replicate')
+        input(:,:,ii) = padarray(image(:, :, ii), [row_margin col_margin], 'replicate');
+    end
+end
+
+%processing the output image
+for ii = 1:size(image,3)
+    for jj = 1:size(input,1)-size(filter,1)+1
+        for kk = 1:size(input,2)-size(filter,2)+1
+         %Calculate the output by convoluting the image and the filter
+         output(jj,kk,ii) = sum(sum(filter.*input(jj:jj+size(filter,1)-1,kk:kk+size(filter,2)-1,ii)));
+        end
+    end 
+end
+end
+
+</code></pre>
+<div style="clear:both">
+<h2>Results</h2>
+
+<p> The example of a hybrid image, formed by merging a cat and a dog has been taken to illustrate the response to different filters, and the intermediate steps in the formation of a hybrid image. 
+<br> For the rest of the image pairs, the input and output images alone are shown. 
+<h3>Results in a table</h3>
+
+<table border=1>
+<h3>proj1_test_filtering</h3>
+<table>
+<tr>
+<td valign='top'>
+<img src="cat_dog/identity_image.jpg" width="60%"/><br>
+Identity Filter
+</td >
+<td valign='top'>
+<img src="cat_dog/blur_image.jpg"  width="60%"/><br>
+Small Blur
+</td>
+<td valign='top'>
+<img src="cat_dog/large_blur_image.jpg" width="60%"/><br>
+Large Blur
+</td>
+</td>
+</tr>
+
+<tr>
+<td>
+<img src="cat_dog/sobel_image.jpg" width="60%"/><br>
+Sobel Filter <br> 
+</td>
+<td>
+<img src="cat_dog/laplacian_image.jpg" width="60%"/><br>
+Laplacian Filter
+</td>
+<td>
+<img src="cat_dog/high_pass_image.jpg"  width="60%"/><br>
+High pass filter
+</td>
+</tr>
+</table>
+
+<h4> Dog (Low_Freq) and Cat (High_Freq) (Cutoff Freq = 7)</h4>
+<table>
+<tr>
+<td>
+<img src="cat_dog/low_frequencies.jpg" width="80%"><br>
+'Dog' - Removing the high frequencies
+</td>
+<td>
+<img src="cat_dog/high_frequencies.jpg" width='80%'><br>
+'Cat' - Removing the low frequencies
+</td>
+<td>
+<img src="cat_dog/hybrid_image.jpg" width='80%'><br>
+Hybrid Image
+</td>
+</tr>
+<tr>
+<td colspan=3>
+<img src="cat_dog/hybrid_image_scales.jpg">
+</td>
+</tr>
+</table>
+
+<h4> Time taken to run the program </h4>
+<table>
+<tr>
+<td>
+<img src = "cat_dog/time.jpg" width ="80%"><br>
+Time taken to run my_imfilter
+</td>
+<td>
+<img src = "cat_dog/time2.jpg" width ="80%"><br>
+Time taken to run imfilter
+</td>
+</tr>
+</table>
+
+<div style="clear:both" >
+<p>There is a clear difference in the execution time between the inbuilt imfilter function and the looping statements written to replicate the function. One reason for this could be that, imfilter calls conv2 for convolution, which is a built=in matlab function, and is already pre compiled with the software. To minimize the looping statements, im2col and col2im functions were used. This reduced the two nested for loopes which were used previously to one. Surprisingly, the execution time results obtained with these commands show a even larger execution time. </p>
+<table>
+<tr>
+<td>
+<img src = "cat_dog/time3.jpg" width = "50%"><br>
+</td>
+</tr>
+</table>
+<h2>More examples of Hybrid Images</h2>
+<h4> Motorcycle (Low_Freq) and Bicycle (High_Freq) ( Freq1 = 8, Freq2 = 3)</h4>
+<table>
+<tr>
+<td>
+<img src="bike_cycle/low_frequencies.jpg" width="80%"><br>
+'Motorcycle' - Removing the high frequencies
+</td>
+<td>
+<img src="bike_cycle/high_frequencies.jpg" width='80%'><br>
+'Bicycle' - Removing the low frequencies
+</td>
+<td>
+<img src="bike_cycle/hybrid_image.jpg" width='80%'><br>
+Hybrid Image
+</td>
+</tr>
+<tr>
+<td colspan=3>
+<img src="bike_cycle/hybrid_image_scales.jpg">
+</td>
+</tr>
+</table>
+
+<h4> Bird (Low_Freq) and Plane (High_Freq) ( Cutoff Freq = 7)</h4>
+<table>
+<tr>
+<td>
+<img src="bird_plane/low_frequencies.jpg" width="80%"><br>
+'Bird' - Removing the high frequencies
+</td>
+<td>
+<img src="bird_plane/high_frequencies.jpg" width='80%'><br>
+'Plane' - Removing the low frequencies
+</td>
+<td>
+<img src="bird_plane/hybrid_image.jpg" width='80%'><br>
+Hybrid Image
+</td>
+</tr>
+<tr>
+<td colspan=3>
+<img src="bird_plane/hybrid_image_scales.jpg">
+</td>
+</tr>
+</table>
+
+<h4> Einstein (Low_Freq) and Marilyn (High_Freq) (Freq1 = 6, freq2 =5)</h4>
+<table>
+<tr>
+<td>
+<img src="einstein_marilyn/low_frequencies.jpg" width="80%"><br>
+'Einstein' - Removing the high frequencies
+</td>
+<td>
+<img src="einstein_marilyn/high_frequencies.jpg" width='80%'><br>
+'Marilyn' - Removing the low frequencies
+</td>
+<td>
+<img src="einstein_marilyn/hybrid_image.jpg" width='80%'><br>
+Hybrid Image
+</td>
+</tr>
+<tr>
+<td colspan=3>
+<img src="einstein_marilyn/hybrid_image_scales.jpg">
+</td>
+</tr>
+</table>
+ <p>Below is an example of the hybrid images formed when different the images are filtered alternatively for high and low frequencies. </p>
+ 
+ <h4> Fish (Low_Freq) and Submarine (High_Freq) (Freq1 = 6, freq2 =3)</h4>
+<table>
+<tr>
+<td>
+<img src="fish_sub/low_frequencies.jpg" width="80%"><br>
+'Fish' - Removing the high frequencies
+</td>
+<td>
+<img src="fish_sub/high_frequencies.jpg" width='80%'><br>
+'Submarine' - Removing the low frequencies
+</td>
+<td>
+<img src="fish_sub/hybrid_image.jpg" width='80%'><br>
+Hybrid Image
+</td>
+</tr>
+<tr>
+<td colspan=3>
+<img src="fish_sub/hybrid_image_scales.jpg">
+</td>
+</tr>
+</table>
+
+ <h4> Submarine (Low_Freq) and Fish (High_Freq) (Freq1 = 6, freq2 =3)</h4>
+<table>
+<tr>
+<td>
+<img src="sub_fish/low_frequencies.jpg" width="80%"><br>
+'Submarine' - Removing the high frequencies
+</td>
+<td>
+<img src="sub_fish/high_frequencies.jpg" width='80%'><br>
+'Fish' - Removing the low frequencies
+</td>
+<td>
+<img src="sub_fish/hybrid_image.jpg" width='80%'><br>
+Hybrid Image
+</td>
+</tr>
+<tr>
+<td colspan=3>
+<img src="sub_fish/hybrid_image_scales.jpg">
+</td>
+</tr>
+</table>
+
+<p> To try creating a hybrid image from a different set of images apart from the image pairs given for the assignment, the first car ever made and the Mercedes GLA were merged. Indeed, Mercedes has come a long way!! </p>
+<h4> Mercedes-Benz GLA (Low_Freq) and Three Wheeled Motorwagen (High_Freq) (Freq1 = 7, freq2 =4)</h4>
+<table>
+<tr>
+<td>
+<img src="karl_benz/low_frequencies.jpg" width="80%"><br>
+'Mercedes-Benz GLA' - Removing the high frequencies
+</td>
+<td>
+<img src="karl_benz/high_frequencies.jpg" width='80%'><br>
+'Three Wheeled Motorwagen' - Removing the low frequencies
+</td>
+<td>
+<img src="karl_benz/hybrid_image.jpg" width='80%'><br>
+Hybrid Image
+</td>
+</tr>
+<tr>
+<td colspan=3>
+<img src="karl_benz/hybrid_image_scales.jpg" width = "80%">
+</td>
+</tr>
+</table>
